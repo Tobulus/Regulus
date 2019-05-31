@@ -45,7 +45,6 @@ public class Compiler {
     }
 
     private void compileCharacterClass(StringLookAhead iterator, Stack<Fragment> fragments) {
-        // TODO check merging with simple concat
         iterator.eat('[');
 
         boolean negate = false;
@@ -56,7 +55,8 @@ public class Compiler {
 
         Predicate<Character> matcher = null;
         while (iterator.hasMore() && iterator.current() != ']') {
-            //TODO escaping
+            removeEscaping(iterator);
+
             Character transitionChar = iterator.current();
             Predicate<Character> p = (character) -> character.equals(transitionChar);
             if (matcher == null) {

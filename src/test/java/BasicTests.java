@@ -136,13 +136,15 @@ public class BasicTests {
     }
 
     @Test
-    public void escaping(){
+    public void escaping() {
         Matcher m = new Compiler().compile("\\*");
         assertTrue(m.test("*"));
+        m = new Compiler().compile("\\.");
+        assertTrue(m.test("."));
     }
 
     @Test
-    public void characterClass(){
+    public void characterClass() {
         Matcher m = new Compiler().compile("[abc]");
         assertTrue(m.test("a"));
         assertTrue(m.test("b"));
@@ -162,10 +164,14 @@ public class BasicTests {
         assertTrue(m.test("aaef"));
         assertTrue(m.test("abcef"));
         assertFalse(m.test("abdef"));
+
+        m = new Compiler().compile("[\\.,]+");
+        assertTrue(m.test(".,."));
+        assertFalse(m.test("a"));
     }
 
     @Test
-    public void negateCharacterClass(){
+    public void negateCharacterClass() {
         Matcher m = new Compiler().compile("[^abc]");
         assertFalse(m.test("a"));
         assertFalse(m.test("b"));
