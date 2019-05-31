@@ -14,9 +14,7 @@ public class Compiler {
         Node end = new Node();
         end.markAsEnd();
 
-        fragment.getDangling().forEach(dangling -> {
-            dangling.setDestination(end);
-        });
+        fragment.getDangling().forEach(dangling -> dangling.setDestination(end));
 
         return new NFA(fragment.getStart(),
                 fragment.getDangling().stream().map(Transition::getStart).collect(Collectors.toList()));
@@ -34,10 +32,10 @@ public class Compiler {
                 break;
             } else if (iterator.current() == '[') {
                 compileCharacterClass(iterator, fragments);
-                pushConcat(iterator, fragments);
+                pushConcat(fragments);
             } else {
                 readConcat(iterator, fragments);
-                pushConcat(iterator, fragments);
+                pushConcat(fragments);
             }
         }
 
@@ -138,10 +136,10 @@ public class Compiler {
             fragments.push(compile(iterator, new Stack<>()));
         }
 
-        pushOr(iterator, fragments);
+        pushOr(fragments);
     }
 
-    private void pushOr(StringLookAhead iterator, Stack<Fragment> fragments) {
+    private void pushOr(Stack<Fragment> fragments) {
         Fragment right = fragments.pop();
         Fragment left = fragments.pop();
 
@@ -190,16 +188,14 @@ public class Compiler {
         }
     }
 
-    private void pushConcat(StringLookAhead iterator, Stack<Fragment> fragments) {
+    private void pushConcat(Stack<Fragment> fragments) {
         Fragment second = fragments.pop();
         Fragment first = fragments.isEmpty() ? null : fragments.pop();
 
         if (first == null) {
             first = new Fragment(second.getStart(), second.getDangling());
         } else {
-            first.getDangling().forEach(dangling -> {
-                dangling.setDestination(second.getStart());
-            });
+            first.getDangling().forEach(dangling -> dangling.setDestination(second.getStart()));
             first.setDangling(second.getDangling());
         }
 
