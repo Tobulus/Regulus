@@ -140,4 +140,36 @@ public class BasicTests {
         Matcher m = new Compiler().compile("\\*");
         assertTrue(m.test("*"));
     }
+
+    @Test
+    public void characterClass(){
+        Matcher m = new Compiler().compile("[abc]");
+        assertTrue(m.test("a"));
+        assertTrue(m.test("b"));
+        assertTrue(m.test("c"));
+
+        m = new Compiler().compile("[abc]+");
+        assertFalse(m.test(""));
+        assertTrue(m.test("a"));
+        assertTrue(m.test("ab"));
+        assertTrue(m.test("aa"));
+        assertTrue(m.test("ca"));
+        assertTrue(m.test("cc"));
+
+        m = new Compiler().compile("([abc]+|d)ef");
+        assertTrue(m.test("aef"));
+        assertTrue(m.test("def"));
+        assertTrue(m.test("aaef"));
+        assertTrue(m.test("abcef"));
+        assertFalse(m.test("abdef"));
+    }
+
+    @Test
+    public void negateCharacterClass(){
+        Matcher m = new Compiler().compile("[^abc]");
+        assertFalse(m.test("a"));
+        assertFalse(m.test("b"));
+        assertFalse(m.test("c"));
+        assertTrue(m.test("d"));
+    }
 }

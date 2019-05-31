@@ -32,6 +32,9 @@ public class Compiler {
                 fragments.push(compileGroup(iterator));
             } else if (iterator.current() == ')') {
                 break;
+            } else if (iterator.current() == '[') {
+                compileCharacterClass(iterator, fragments);
+                pushConcat(iterator, fragments);
             } else {
                 readConcat(iterator, fragments);
                 pushConcat(iterator, fragments);
@@ -39,6 +42,50 @@ public class Compiler {
         }
 
         return fragments.pop();
+    }
+
+    private void compileCharacterClass(StringLookAhead iterator, Stack<Fragment> fragments) {
+        // TODO check merging with simple concat
+        iterator.eat('[');
+
+        boolean negate = false;
+        if (iterator.current() == '^') {
+            negate = true;
+            iterator.proceedPosition();
+        }
+
+        Predicate<Character> matcher = null;
+        while (iterator.hasMore() && iterator.current() != ']') {
+            //TODO escaping
+            Character transitionChar = iterator.current();
+            Predicate<Character> p = (character) -> character.equals(transitionChar);
+            if (matcher == null) {
+                matcher = p;
+            } else {
+                matcher = matcher.or(p);
+            }
+
+            iterator.proceedPosition();
+        }
+
+        if (negate) {
+            matcher = matcher.negate();
+        }
+
+        Node start = new Node();
+        Transition transition = new Transition(matcher, null);
+        start.addTransition(transition);
+
+        Fragment fragment = new Fragment(start, Collections.singletonList(transition));
+        fragments.push(fragment);
+
+        iterator.eat(']');
+
+        if (iterator.hasMore()) {
+            if (isQuantifier(iterator.current())) {
+                compileQuantifier(iterator, fragments);
+            }
+        }
     }
 
     private boolean isQuantifier(Character character) {
