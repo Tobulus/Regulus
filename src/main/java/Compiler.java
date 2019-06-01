@@ -3,23 +3,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Compiler {
     public Matcher compile(String regex) {
         StringLookAhead iterator = new StringLookAhead(new Optimizer().prepare(regex));
-        NFA nfa = generateNfa(compile(iterator, new Stack<>()));
+        Node nfa = generateNfa(compile(iterator, new Stack<>()));
         return new Matcher(nfa);
     }
 
-    private NFA generateNfa(Fragment fragment) {
+    private Node generateNfa(Fragment fragment) {
         Node end = new Node();
         end.markAsEnd();
 
         fragment.getDangling().forEach(dangling -> dangling.setDestination(end));
 
-        return new NFA(fragment.getStart(),
-                fragment.getDangling().stream().map(Transition::getStart).collect(Collectors.toList()));
+        return fragment.getStart();
     }
 
     private Fragment compile(StringLookAhead iterator, Stack<Fragment> fragments) {

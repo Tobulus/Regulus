@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Matcher {
-    private NFA nfa;
+    private Node nfa;
 
-    public Matcher(NFA nfa) {
+    public Matcher(Node nfa) {
         this.nfa = nfa;
     }
 
     public boolean test(String s) {
         HashMap<Integer, Node> currentNodes = new HashMap<>();
         List<Node> startNodes = new ArrayList<>();
-        currentNodes.put(nfa.getStart().getId(), nfa.getStart());
-        nfa.getStart().followEmptyTransitions(nfa.getStart(), startNodes);
+        currentNodes.put(nfa.getId(), nfa);
+        nfa.followEmptyTransitions(nfa, startNodes);
         startNodes.forEach(n -> currentNodes.put(n.getId(), n));
 
         for (int i = 0; i < s.length(); i++) {

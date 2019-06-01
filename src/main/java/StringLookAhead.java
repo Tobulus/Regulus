@@ -1,6 +1,3 @@
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 class StringLookAhead {
     private String string;
     private int currentIndex = 0;
@@ -21,10 +18,9 @@ class StringLookAhead {
         }
     }
 
-    public void eat(Character... characters) {
-        if (Arrays.stream(characters).noneMatch(character -> character.equals(current()))) {
-            throw new CompileException(String.format("Excepted '%s' but found '%s' at position %s",
-                    Arrays.stream(characters).map(c -> String.valueOf(c)).collect(Collectors.joining("|")), current(), currentPosition()));
+    public void eat(Character character) {
+        if (!character.equals(current())) {
+            throw new CompileException(String.format("Excepted '%s' but found '%s' at position %s", character, current(), currentPosition()));
         }
         proceedPosition();
     }
@@ -41,10 +37,6 @@ class StringLookAhead {
 
     public boolean hasMore() {
         return currentIndex < string.length();
-    }
-
-    public Character next() {
-        return string.charAt(currentIndex + 1);
     }
 
     public void proceedPosition() {
