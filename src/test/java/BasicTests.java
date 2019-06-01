@@ -1,7 +1,6 @@
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BasicTests {
     @Test
@@ -177,5 +176,35 @@ public class BasicTests {
         assertFalse(m.test("b"));
         assertFalse(m.test("c"));
         assertTrue(m.test("d"));
+    }
+
+    @Test
+    public void minMax() {
+        Matcher m = new Compiler().compile("[^abc]{1,3}");
+        assertFalse(m.test(""));
+        assertTrue(m.test("d"));
+        assertTrue(m.test("dd"));
+        assertTrue(m.test("ddd"));
+        assertFalse(m.test("dddd"));
+        assertTrue(m.test("e"));
+
+        m = new Compiler().compile("(dog){1,}");
+        assertFalse(m.test(""));
+        assertTrue(m.test("dog"));
+        assertTrue(m.test("dogdog"));
+    }
+
+    @Test
+    public void prepare() {
+        assertEquals("abc", new Compiler().prepare("abc"));
+        assertEquals("ab*c", new Compiler().prepare("ab*c"));
+        assertEquals("(abc)", new Compiler().prepare("(abc)"));
+        assertEquals("(abc)+|(def)*", new Compiler().prepare("(abc)+|(def)*"));
+        assertEquals("aaa?", new Compiler().prepare("a{2,3}"));
+        assertEquals("aaa*", new Compiler().prepare("a{2,}"));
+        assertEquals("a?a?a?", new Compiler().prepare("a{0,3}"));
+        assertEquals("(dog)?(dog)?(dog)?", new Compiler().prepare("(dog){0,3}"));
+        assertEquals("(dog)(dog)?(dog)?", new Compiler().prepare("(dog){1,3}"));
+        assertEquals("(dog)(dog)*", new Compiler().prepare("(dog){1,}"));
     }
 }
