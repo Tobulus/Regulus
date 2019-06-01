@@ -196,15 +196,15 @@ public class BasicTests {
 
     @Test
     public void prepare() {
-        assertEquals("abc", new Compiler().prepare("abc"));
-        assertEquals("ab*c", new Compiler().prepare("ab*c"));
-        assertEquals("(abc)", new Compiler().prepare("(abc)"));
-        assertEquals("(abc)+|(def)*", new Compiler().prepare("(abc)+|(def)*"));
-        assertEquals("aaa?", new Compiler().prepare("a{2,3}"));
-        assertEquals("aaa*", new Compiler().prepare("a{2,}"));
-        assertEquals("a?a?a?", new Compiler().prepare("a{0,3}"));
-        assertEquals("(dog)?(dog)?(dog)?", new Compiler().prepare("(dog){0,3}"));
-        assertEquals("(dog)(dog)?(dog)?", new Compiler().prepare("(dog){1,3}"));
-        assertEquals("(dog)(dog)*", new Compiler().prepare("(dog){1,}"));
+        assertEquals("abc", new Optimizer().prepare("abc"));
+        assertEquals("ab*c", new Optimizer().prepare("ab*c"));
+        assertEquals("(abc)", new Optimizer().prepare("(abc)"));
+        assertEquals("(abc)+|(def)*", new Optimizer().prepare("(abc)+|(def)*"));
+        assertEquals("aaa?", new Optimizer().prepare("a{2,3}"));
+        assertEquals("aaa*", new Optimizer().prepare("a{2,}"));
+        assertEquals("a?a?a?", new Optimizer().prepare("a{0,3}"));
+        assertEquals("(dog)?(dog)?(dog)?", new Optimizer().prepare("(dog){0,3}"));
+        assertEquals("(dog)(dog)?(dog)?", new Optimizer().prepare("(dog){1,3}"));
+        assertEquals("(dog)(dog)*", new Optimizer().prepare("(dog){1,}"));
     }
 }
