@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Compiler {
-
     public Matcher compile(String regex) {
         StringLookAhead iterator = new StringLookAhead(prepare(regex));
         NFA nfa = generateNfa(compile(iterator, new Stack<>()));
