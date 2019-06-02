@@ -10,6 +10,10 @@ class StringLookAhead {
         return string.charAt(currentIndex);
     }
 
+    public Character next() {
+        return string.charAt(currentIndex + 1);
+    }
+
     public int currentAsInt() throws CompileException {
         try {
             return Integer.parseInt(String.valueOf(current()));

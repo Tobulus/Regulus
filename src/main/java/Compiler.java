@@ -59,16 +59,24 @@ public class Compiler {
 
         Predicate<Character> matcher = null;
         while (iterator.hasMore() && iterator.current() != ']') {
-            removeEscaping(iterator);
-
-            Character transitionChar = iterator.current();
-            Predicate<Character> p = (character) -> character.equals(transitionChar);
-            if (matcher == null) {
-                matcher = p;
+            if (iterator.current() == '\\' && iterator.hasNext() && MetaCharacters.exists(iterator.next())) {
+                iterator.proceedPosition();
+                if (matcher == null) {
+                    matcher = MetaCharacters.getHandler(iterator.current());
+                } else {
+                    matcher = matcher.or(MetaCharacters.getHandler(iterator.current()));
+                }
             } else {
-                matcher = matcher.or(p);
-            }
+                removeEscaping(iterator);
 
+                Character transitionChar = iterator.current();
+                Predicate<Character> p = (character) -> character.equals(transitionChar);
+                if (matcher == null) {
+                    matcher = p;
+                } else {
+                    matcher = matcher.or(p);
+                }
+            }
             iterator.proceedPosition();
         }
 
@@ -160,15 +168,26 @@ public class Compiler {
     }
 
     private void readConcat(StringLookAhead iterator, Stack<Fragment> fragments) {
-        removeEscaping(iterator);
+        if (iterator.current() == '\\' && iterator.hasNext() && MetaCharacters.exists(iterator.next())) {
+            iterator.proceedPosition();
 
-        Node start = new Node();
-        Character transitionChar = iterator.current();
-        Transition transition = new Transition(compileMatcher(transitionChar), null);
-        start.addTransition(transition);
+            Node start = new Node();
+            Transition transition = new Transition(MetaCharacters.getHandler(iterator.current()), null);
+            start.addTransition(transition);
 
-        Fragment fragment = new Fragment(start, Collections.singletonList(transition));
-        fragments.push(fragment);
+            Fragment fragment = new Fragment(start, Collections.singletonList(transition));
+            fragments.push(fragment);
+        } else {
+            boolean escaped = removeEscaping(iterator);
+
+            Node start = new Node();
+            Character transitionChar = iterator.current();
+            Transition transition = new Transition(compileMatcher(transitionChar, escaped), null);
+            start.addTransition(transition);
+
+            Fragment fragment = new Fragment(start, Collections.singletonList(transition));
+            fragments.push(fragment);
+        }
 
         iterator.proceedPosition();
 
@@ -179,14 +198,16 @@ public class Compiler {
         }
     }
 
-    private void removeEscaping(StringLookAhead iterator) {
+    private boolean removeEscaping(StringLookAhead iterator) {
         if (iterator.current() == '\\') {
             iterator.proceedPosition();
+            return true;
         }
+        return false;
     }
 
-    private Predicate<Character> compileMatcher(Character character) {
-        if (character == '.') {
+    private Predicate<Character> compileMatcher(Character character, boolean escaped) {
+        if (character == '.' && !escaped) {
             // TODO check correct semantics
             return (c) -> !c.equals('\n');
         } else {

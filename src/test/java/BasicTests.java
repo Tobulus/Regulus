@@ -207,4 +207,32 @@ public class BasicTests {
         assertEquals("(dog)(dog)?(dog)?", new Optimizer().prepare("(dog){1,3}"));
         assertEquals("(dog)(dog)*", new Optimizer().prepare("(dog){1,}"));
     }
+
+    @Test
+    public void metaCharacters() {
+        Matcher m = Pattern.compile("\\d");
+        assertFalse(m.test("a"));
+        assertTrue(m.test("1"));
+        assertFalse(m.test("11"));
+
+        m = Pattern.compile("\\d*");
+        assertTrue(m.test(""));
+        assertTrue(m.test("1"));
+        assertTrue(m.test("12"));
+        assertTrue(m.test("123"));
+
+        m = Pattern.compile("\\w+");
+        assertFalse(m.test(""));
+        assertTrue(m.test("a"));
+        assertTrue(m.test("ab"));
+        assertTrue(m.test("abc"));
+    }
+
+    @Test
+    public void email() {
+        Matcher m = Pattern.compile("[\\w\\.+-]+@[\\w\\.-]+\\.[\\w\\.-]+");
+        assertTrue(m.test("admin@domain.com"));
+        assertTrue(m.test("cooldude-42@gmail.net"));
+        assertFalse(m.test("@gmail.net"));
+    }
 }
