@@ -238,6 +238,12 @@ public class BasicTests {
 
         Matcher ipv4 = Pattern.compile("((25[0-5]|2[0-4]\\d|[01]?\\d\\d)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d)");
         assertTrue(ipv4.test("255.201.199.255"));
+
+        Matcher uri = Pattern.compile("[\\w]+://[^/\\s?#]+[^\\s?#]+(\\?[^\\s#]*)?(#[^\\s]*)?");
+        assertTrue(uri.test("http://google.de"));
+        assertFalse(uri.test("http://wr ong.de"));
+        assertFalse(uri.test("://google.de"));
+        assertTrue(uri.test("http://google.de?query=test"));
     }
 
     @Test
