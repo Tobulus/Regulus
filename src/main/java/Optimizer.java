@@ -14,7 +14,6 @@ public class Optimizer {
         while (iterator.hasMore()) {
             if (iterator.current() == '(' || iterator.current() == '[') {
                 preparedRegex.append(collectGroup(iterator));
-                buffer.setLength(0);
             } else if (iterator.current() == ')' || iterator.current() == ']') {
                 break;
             } else if (iterator.current() == '\\') {
@@ -27,10 +26,8 @@ public class Optimizer {
                 } else {
                     preparedRegex.append(buffer);
                 }
-                buffer.setLength(0);
             } else if (iterator.current() == '{') {
                 preparedRegex.append(parseMinMax(buffer, iterator));
-                buffer.setLength(0);
             } else {
                 buffer.append(iterator.current());
                 iterator.proceedPosition();
@@ -39,8 +36,8 @@ public class Optimizer {
                 } else {
                     preparedRegex.append(buffer);
                 }
-                buffer.setLength(0);
             }
+            buffer.setLength(0);
         }
     }
 
