@@ -7,11 +7,12 @@ This is mainly for educational purposes. If you are searching for a production r
 ## Currently supported
 - Quantifiers: "*", "+", "?", "{3,4}"
 - Character classes: "[abc]", "[^abc]"
+- Ranges: "[a-z]"
+- Metacharacters: "\d", "\s", ...
 - Grouping: "(abc)*"
 - Alternation: "a|b"
 - Wildcard: "."
 
 ## TODO
-- Predefined character classes: "\s", "\d", ...
 - Group extraction
 - ...
