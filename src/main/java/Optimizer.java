@@ -1,32 +1,66 @@
 public class Optimizer {
+
     public String prepare(String regex) {
         StringBuilder preparedRegex = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
         StringLookAhead iterator = new StringLookAhead(regex);
+
+        prepare(preparedRegex, iterator);
+        return preparedRegex.toString();
+    }
+
+    private void prepare(StringBuilder preparedRegex, StringLookAhead iterator) {
+        StringBuilder buffer = new StringBuilder();
 
         while (iterator.hasMore()) {
             if (iterator.current() == '(' || iterator.current() == '[') {
-                appendAndClearBuffer(preparedRegex, buffer);
-                buffer.append(collectGroup(iterator));
+                preparedRegex.append(collectGroup(iterator));
+                buffer.setLength(0);
+            } else if (iterator.current() == ')' || iterator.current() == ']') {
+                break;
             } else if (iterator.current() == '\\') {
-                appendAndClearBuffer(preparedRegex, buffer);
                 buffer.append(iterator.current());
                 iterator.proceedPosition();
                 buffer.append(iterator.current());
                 iterator.proceedPosition();
+                if (iterator.hasMore() && iterator.current() == '{') {
+                    preparedRegex.append(parseMinMax(buffer, iterator));
+                } else {
+                    preparedRegex.append(buffer);
+                }
+                buffer.setLength(0);
             } else if (iterator.current() == '{') {
                 preparedRegex.append(parseMinMax(buffer, iterator));
                 buffer.setLength(0);
             } else {
-                appendAndClearBuffer(preparedRegex, buffer);
                 buffer.append(iterator.current());
                 iterator.proceedPosition();
+                if (iterator.hasMore() && iterator.current() == '{') {
+                    preparedRegex.append(parseMinMax(buffer, iterator));
+                } else {
+                    preparedRegex.append(buffer);
+                }
+                buffer.setLength(0);
             }
         }
+    }
 
-        preparedRegex.append(buffer);
+    private StringBuilder collectGroup(StringLookAhead iterator) {
+        Character limiter = iterator.current() == '(' ? ')' : ']';
+        StringBuilder group = new StringBuilder();
 
-        return preparedRegex.toString();
+        group.append(iterator.current());
+        iterator.proceedPosition();
+
+        prepare(group, iterator);
+
+        group.append(limiter);
+        iterator.eat(limiter);
+
+        if (iterator.hasMore() && iterator.current() == '{') {
+            group = parseMinMax(group, iterator);
+        }
+
+        return group;
     }
 
     private StringBuilder parseMinMax(StringBuilder buffer, StringLookAhead iterator) {
@@ -63,26 +97,5 @@ public class Optimizer {
         iterator.eat('}');
 
         return result;
-    }
-
-    private StringBuilder collectGroup(StringLookAhead iterator) {
-        StringBuilder group = new StringBuilder();
-        Character delimiter = iterator.current() == '(' ? ')' : ']';
-
-        while (iterator.hasMore() && iterator.current() != delimiter) {
-            group.append(iterator.current());
-            iterator.proceedPosition();
-        }
-        if (iterator.current() == delimiter) {
-            group.append(iterator.current());
-            iterator.proceedPosition();
-        }
-
-        return group;
-    }
-
-    private void appendAndClearBuffer(StringBuilder preparedRegex, StringBuilder buffer) {
-        preparedRegex.append(buffer);
-        buffer.setLength(0);
     }
 }

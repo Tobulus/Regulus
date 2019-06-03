@@ -206,6 +206,7 @@ public class BasicTests {
         assertEquals("(dog)?(dog)?(dog)?", new Optimizer().prepare("(dog){0,3}"));
         assertEquals("(dog)(dog)?(dog)?", new Optimizer().prepare("(dog){1,3}"));
         assertEquals("(dog)(dog)*", new Optimizer().prepare("(dog){1,}"));
+        assertEquals("((1)\\.)((1)\\.)((1)\\.)", new Optimizer().prepare("((1)\\.){3}"));
     }
 
     @Test
@@ -229,10 +230,15 @@ public class BasicTests {
     }
 
     @Test
-    public void email() {
-        Matcher m = Pattern.compile("[\\w\\.+-]+@[\\w\\.-]+\\.[\\w\\.-]+");
-        assertTrue(m.test("admin@domain.com"));
-        assertTrue(m.test("cooldude-42@gmail.net"));
-        assertFalse(m.test("@gmail.net"));
+    public void complex() {
+        Matcher email = Pattern.compile("[\\w\\.+-]+@[\\w\\.-]+\\.[\\w\\.-]+");
+        assertTrue(email.test("admin@domain.com"));
+        assertTrue(email.test("cooldude-42@gmail.net"));
+        assertFalse(email.test("@gmail.net"));
+
+        // TODO allow defintions like "0-5" for "012345"
+        Matcher ipv4 = Pattern.compile("((25[012345]|2[01234]\\d|[01]?\\d\\d)\\.){3}(25[012345]|2[01234]\\d|[01]?\\d\\d)");
+        assertTrue(ipv4.test("255.201.199.255"));
+
     }
 }
