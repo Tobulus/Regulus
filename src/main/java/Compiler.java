@@ -61,21 +61,14 @@ public class Compiler {
         while (iterator.hasMore() && iterator.current() != ']') {
             if (iterator.current() == '\\' && iterator.hasNext() && MetaCharacters.exists(iterator.next())) {
                 iterator.proceedPosition();
-                if (matcher == null) {
-                    matcher = MetaCharacters.getHandler(iterator.current());
-                } else {
-                    matcher = matcher.or(MetaCharacters.getHandler(iterator.current()));
-                }
+                matcher = or(matcher, MetaCharacters.getHandler(iterator.current()));
+            } else if (iterator.hasNext() && iterator.next() == '-' && iterator.hasNextNext() && iterator.nextNext() != ']') {
+                matcher = parseRange(iterator);
             } else {
                 removeEscaping(iterator);
 
                 Character transitionChar = iterator.current();
-                Predicate<Character> p = (character) -> character.equals(transitionChar);
-                if (matcher == null) {
-                    matcher = p;
-                } else {
-                    matcher = matcher.or(p);
-                }
+                matcher = or(matcher, (character) -> character.equals(transitionChar));
             }
             iterator.proceedPosition();
         }
@@ -97,6 +90,23 @@ public class Compiler {
             if (isQuantifier(iterator.current())) {
                 compileQuantifier(iterator, fragments);
             }
+        }
+    }
+
+    private Predicate<Character> parseRange(StringLookAhead iterator) {
+        Character from = iterator.current();
+        iterator.proceedPosition();
+        iterator.eat('-');
+        Character to = iterator.current();
+
+        return (character) -> character >= from && character <= to;
+    }
+
+    private Predicate<Character> or(Predicate<Character> current, Predicate<Character> next) {
+        if (current == null) {
+            return next;
+        } else {
+            return current.or(next);
         }
     }
 

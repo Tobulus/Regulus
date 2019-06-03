@@ -14,6 +14,10 @@ class StringLookAhead {
         return string.charAt(currentIndex + 1);
     }
 
+    public Character nextNext() {
+        return string.charAt(currentIndex + 2);
+    }
+
     public int currentAsInt() throws CompileException {
         try {
             return Integer.parseInt(String.valueOf(current()));
@@ -37,6 +41,10 @@ class StringLookAhead {
 
     public boolean hasNext() {
         return string.length() > currentIndex + 1;
+    }
+
+    public boolean hasNextNext() {
+        return string.length() > currentIndex + 2;
     }
 
     public boolean hasMore() {

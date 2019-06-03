@@ -236,9 +236,24 @@ public class BasicTests {
         assertTrue(email.test("cooldude-42@gmail.net"));
         assertFalse(email.test("@gmail.net"));
 
-        // TODO allow defintions like "0-5" for "012345"
-        Matcher ipv4 = Pattern.compile("((25[012345]|2[01234]\\d|[01]?\\d\\d)\\.){3}(25[012345]|2[01234]\\d|[01]?\\d\\d)");
+        Matcher ipv4 = Pattern.compile("((25[0-5]|2[0-4]\\d|[01]?\\d\\d)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d)");
         assertTrue(ipv4.test("255.201.199.255"));
+    }
 
+    @Test
+    public void range() {
+        Matcher m = Pattern.compile("[4-7]{2}");
+        assertTrue(m.test("54"));
+        assertTrue(m.test("76"));
+        assertTrue(m.test("54"));
+        assertFalse(m.test("15"));
+        assertFalse(m.test("98"));
+
+        m = Pattern.compile("[b-m]{2,3}");
+        assertTrue(m.test("bhi"));
+        assertTrue(m.test("gkl"));
+        assertTrue(m.test("cde"));
+        assertFalse(m.test("abc"));
+        assertFalse(m.test("Bde"));
     }
 }
