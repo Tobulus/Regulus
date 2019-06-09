@@ -1,4 +1,4 @@
-# jRegex- Matching regular expressions in linear time
+# Regulus- Matching regular expressions in linear time
 
 Implements the basic ideas described by [Russ Cox](https://swtch.com/~rsc/regexp/regexp1.html) which basically uses [Thompson's Construction](https://en.wikipedia.org/wiki/Thompson%27s_construction) to generate a non-deterministic finite automaton. The generated NFA can be used to match strings against a regex in linear time.
 
